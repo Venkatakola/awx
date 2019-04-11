@@ -4,6 +4,10 @@ import {
     getTeam,
 } from '../fixtures';
 
+import {
+    AWX_E2E_URL
+} from '../settings';
+
 const namespace = 'test-org-permissions';
 
 let data;
@@ -109,6 +113,8 @@ module.exports = {
             .findThenClick(saveButton)
             // add team-wide permissions to an organization
             .findThenClick(orgsNavTab)
+            .navigateTo(`${AWX_E2E_URL}/#/organizations`, false)
+            .waitForElementVisible(searchBar)
             .clearValue(searchBar)
             .setValue(searchBar, [orgsText, client.Keys.ENTER])
             .waitForElementNotVisible(spinny)

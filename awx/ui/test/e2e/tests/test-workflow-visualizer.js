@@ -5,14 +5,16 @@ import {
     getWorkflowTemplate
 } from '../fixtures';
 
+import {
+    AWX_E2E_URL
+} from '../settings';
+
 let data;
 const spinny = "//*[contains(@class, 'spinny')]";
-const workflowTemplateNavTab = "//at-side-nav-item[contains(@name, 'TEMPLATES')]";
-const workflowSelector = "//a[contains(text(), 'test-actions-workflow-template')]";
+const workflowSelector = "//a[text()='test-actions-workflow-template']";
 const workflowVisualizerBtn = "//button[contains(@id, 'workflow_job_template_workflow_visualizer_btn')]";
 const workflowSearchBar = "//input[contains(@class, 'SmartSearch-input')]";
 const workflowText = 'name.iexact:"test-actions-workflow-template"';
-const workflowSearchBadgeCount = '//span[contains(@class, "at-Panel-headingTitleBadge") and contains(text(), "1")]';
 
 const startNodeId = '1';
 let initialJobNodeId;
@@ -66,16 +68,21 @@ module.exports = {
             .waitForAngular()
             .resizeWindow(1200, 1000)
             .useXpath()
-            .findThenClick(workflowTemplateNavTab)
+            .navigateTo(`${AWX_E2E_URL}/#/templates`, false)
             .pause(1500)
             .waitForElementNotVisible(spinny)
-            .clearValue(workflowSearchBar)
-            .setValue(workflowSearchBar, [workflowText, client.Keys.ENTER])
-            .waitForElementVisible(workflowSearchBadgeCount)
-            .waitForElementNotVisible(spinny)
+            .waitForElementVisible(workflowSearchBar)
+            .setValue(workflowSearchBar, [workflowText])
+            .pause(1000)
+            .setValue(workflowSearchBar, [client.Keys.ENTER])
+            .pause(1000)
             .findThenClick(workflowSelector)
-            .findThenClick(workflowVisualizerBtn)
-            .waitForElementVisible('//*[contains(@class, "WorkflowChart-nameText") and contains(text(), "test-actions-job")]/..');
+            .pause(1000)
+            .findThenClick(workflowVisualizerBtn);
+        if (client.isVisible(workflowVisualizerBtn)) {
+            client.findThenClick(workflowVisualizerBtn);
+        }
+        client.waitForElementVisible('//*[contains(@class, "WorkflowChart-nameText") and contains(text(), "test-actions-job")]/..');
 
         // Grab the ids of the nodes
         client.getAttribute('//*[contains(@class, "WorkflowChart-nameText") and contains(text(), "test-actions-job")]/..', 'id', (res) => {
